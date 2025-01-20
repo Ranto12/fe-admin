@@ -8,7 +8,7 @@ import Camera from "../icons/Camera";
 const EditGaun = () => {
   const [nama_produk, setNama_produk] = useState("");
   const [kategori, setKategori] = useState("");
-  const [ukuran, setUkuran] = useState("");
+  const [ukuran, setUkuran] = useState([]);
   const [warna, setWarna] = useState("");
   const [harga, setHarga] = useState("");
   const [jumlah, setJumlah] = useState("");
@@ -17,6 +17,7 @@ const EditGaun = () => {
   const [foto, setFoto] = useState([]);
   const [photoDB, setPhotoDB] = useState([]);
   const [removePhoto, setRemovePhoto] = useState([]);
+  const [removeProductSize, setRemoveProductSize] = useState([]);
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -28,6 +29,37 @@ const EditGaun = () => {
     }
   };
 
+  const handleUkuranChange = (e, index) => {
+    const newUkuran = [...ukuran];
+    newUkuran[index].size = e.target.value; // Update the 'ukuran' field
+    setUkuran(newUkuran);
+  };
+
+  const handleJumlahChange = (e, index) => {
+    const newUkuran = [...ukuran];
+    newUkuran[index].stock = e.target.value; // Update the 'jumlah' field
+    setUkuran(newUkuran);
+  };
+
+  const handelAddArrayUkuran = () => {
+    setUkuran([
+      ...ukuran,
+      {
+        size: "",
+        stock: 0,
+      },
+    ]);
+  };
+
+  const handelRemoveArrayUkuran = (id) => {
+    if (ukuran[id]?.id) {
+      setRemoveProductSize([...removeProductSize, ukuran[id]?.id])
+    }
+    const ukuranRemove = ukuran.filter((_, index) => index !== id);
+    setUkuran(ukuranRemove);
+  };
+
+  console.log(removeProductSize, "remove")
   const handleRemoveImage = (index) => {
     setFoto((prevFotos) => prevFotos.filter((_, i) => i !== index)); // Hapus gambar berdasarkan index
   };
@@ -35,9 +67,9 @@ const EditGaun = () => {
     setRemovePhoto((prevFotos) => [
       ...prevFotos,
       {
-        imagePath : photoDB[index].imagePath
-      }
-    ])
+        imagePath: photoDB[index].imagePath,
+      },
+    ]);
     setPhotoDB((prevFotos) => prevFotos.filter((_, i) => i !== index)); // Hapus gambar berdasarkan index
   };
 
@@ -52,19 +84,19 @@ const EditGaun = () => {
         setJumlah(response.data.ProductSizes[0].stock);
         setStatus(response.data.status);
         setKategori(response.data.category);
-        setUkuran(response.data.ProductSizes[0].size);
+        setUkuran(response.data.ProductSizes);
         setWarna(response.data.ProductColors[0].color);
         setNama_produk(response.data.name);
-        setPhotoDB(response.data.ProductImages)
+        setPhotoDB(response.data.ProductImages);
         console.log(kategori, response.data.category);
       } catch (error) {
         console.log(error);
       }
     };
     handleGetProductDetail();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
+  console.log(ukuran);
   const saveGaun = async (e) => {
     e.preventDefault();
 
@@ -77,7 +109,7 @@ const EditGaun = () => {
       !harga ||
       !jumlah ||
       !detail ||
-      !status 
+      !status
     ) {
       console.error("All fields are required");
       return;
@@ -91,15 +123,23 @@ const EditGaun = () => {
       formData.append("details", detail);
       formData.append("colors", warna);
       formData.append("status", status);
-      formData.append("removeImages", JSON.stringify(removePhoto.map((item) => item.imagePath)));
+      formData.append(
+        "removeImages",
+        JSON.stringify(removePhoto.map((item) => item.imagePath))
+      );
+      formData.append(
+        "removeProductSize",
+        JSON.stringify(removeProductSize.map((item) => item))
+      );
       formData.append(
         "sizes",
-        JSON.stringify([
+        JSON.stringify(ukuran.map((item) => (
           {
-            size: ukuran,
-            stock: jumlah,
-          },
-        ])
+            size: item.size,
+            stock: item.stock,
+            id: item.id || 0
+          }
+        )))
       );
 
       // Tambahkan file gambar ke FormData
@@ -107,14 +147,18 @@ const EditGaun = () => {
         formData.append("images", file);
       });
 
-      await axios.post(`http://localhost:5000/api/products/update/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          // Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      await axios.post(
+        `http://localhost:5000/api/products/update/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            // Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-      navigate("/gaun-page"); 
+      navigate("/gaun-page");
     } catch (error) {
       console.error("Error while saving dress:", error);
     }
@@ -146,33 +190,65 @@ const EditGaun = () => {
                 onChange={(e) => setKategori(e.target.value)}
                 required
               >
-                <option value="" disabled>Pilih Kategori</option>
+                <option value="" disabled>
+                  Pilih Kategori
+                </option>
                 <option value="Gaun Pengantin">Gaun Pengantin</option>
                 <option value="Kebaya">Kebaya</option>
                 <option value="Jas">Jas</option>
                 <option value="Batik">Batik</option>
                 <option value="Baju Adat">Baju Adat</option>
-                <option value="Aksesoris Pernikahan">Aksesoris Pernikahan</option>
+                <option value="Aksesoris Pernikahan">
+                  Aksesoris Pernikahan
+                </option>
               </Form.Select>
             </Form.Group>
 
             <Form.Group className="field">
               <Form.Label>Ukuran</Form.Label>
-              <Form.Select
-                value={ukuran}
-                onChange={(e) => setUkuran(e.target.value)}
-                required
-              >
-                <option value="" disabled>
-                  Pilih Ukuran
-                </option>
-                <option value="s">S</option>
-                <option value="m">M</option>
-                <option value="l">L</option>
-                <option value="xl">XL</option>
-                <option value="xxl">XXL</option>
-                <option value="xxxl">XXXL</option>
-              </Form.Select>
+              {ukuran.map((item, index) => (
+                <div
+                  key={index}
+                  style={{ display: "flex", gap: "10px", marginBottom: "10px" }}
+                >
+                  <Form.Select
+                    value={item.size}
+                    onChange={(e) => handleUkuranChange(e, index)}
+                    required
+                    style={{
+                      maxWidth: "100px",
+                    }}
+                  >
+                    <option value="" disabled>
+                      Size
+                    </option>
+                    <option value="s">S</option>
+                    <option value="m">M</option>
+                    <option value="l">L</option>
+                    <option value="xl">XL</option>
+                    <option value="xxl">XXL</option>
+                    <option value="xxxl">XXXL</option>
+                    <option value="-">-</option>
+                  </Form.Select>
+                  <Form.Control
+                    type="number"
+                    placeholder="Jumlah"
+                    value={item.stock}
+                    min={0}
+                    onChange={(e) => handleJumlahChange(e, index)}
+                    style={{
+                      maxWidth: "100px",
+                    }}
+                    required
+                  />
+                  {ukuran.length > 1 && (
+                    <Button onClick={() => handelRemoveArrayUkuran(index)}>
+                      -
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <Button onClick={handelAddArrayUkuran}>+</Button>
             </Form.Group>
 
             <Form.Group className="field">
@@ -199,17 +275,6 @@ const EditGaun = () => {
           </Col>
 
           <Col>
-            <Form.Group className="field">
-              <Form.Label>Jumlah</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Jumlah"
-                value={jumlah}
-                onChange={(e) => setJumlah(e.target.value)}
-                required
-              />
-            </Form.Group>
-
             <Form.Group>
               <Form.Label>Detail</Form.Label>
               <Form.Control

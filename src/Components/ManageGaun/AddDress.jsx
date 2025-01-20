@@ -8,15 +8,46 @@ import Camera from "../icons/Camera.jsx";
 const AddDress = () => {
   const [nama_produk, setNama_produk] = useState("");
   const [kategori, setKategori] = useState("");
-  const [ukuran, setUkuran] = useState("");
+  const [ukuran, setUkuran] = useState([
+    {
+      ukuran: "",
+      jumlah: "",
+    },
+  ]);
   const [warna, setWarna] = useState("");
   const [harga, setHarga] = useState("");
-  const [jumlah, setJumlah] = useState("");
   const [detail, setDetail] = useState("");
   const [status, setStatus] = useState("");
   const [foto, setFoto] = useState([]);
 
   const navigate = useNavigate();
+
+  const handleUkuranChange = (e, index) => {
+    const newUkuran = [...ukuran];
+    newUkuran[index].ukuran = e.target.value; // Update the 'ukuran' field
+    setUkuran(newUkuran);
+  };
+
+  const handleJumlahChange = (e, index) => {
+    const newUkuran = [...ukuran];
+    newUkuran[index].jumlah = e.target.value; // Update the 'jumlah' field
+    setUkuran(newUkuran);
+  };
+
+  const handelAddArrayUkuran = () => {
+    setUkuran([
+      ...ukuran,
+      {
+        ukuran: "",
+        jumlah: 0,
+      },
+    ]);
+  };
+
+  const handelRemoveArrayUkuran = (id) => {
+    const ukuranRemove = ukuran.filter((_, index) => index !== id);
+    setUkuran(ukuranRemove);
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -39,7 +70,6 @@ const AddDress = () => {
       !ukuran ||
       !warna ||
       !harga ||
-      !jumlah ||
       !detail ||
       !status ||
       foto.length === 0
@@ -48,6 +78,12 @@ const AddDress = () => {
       return;
     }
 
+    // JSON.stringify([
+    //   {
+    //     size: ukuran,
+    //     stock: jumlah,
+    //   },
+    // ])
     try {
       const formData = new FormData();
 
@@ -62,12 +98,12 @@ const AddDress = () => {
       );
       formData.append(
         "sizes",
-        JSON.stringify([
+        JSON.stringify(ukuran.map((item) => (
           {
-            size: ukuran,
-            stock: jumlah,
-          },
-        ])
+            size: item.ukuran,
+            stock: item.jumlah,
+          }
+        )))
       );
 
       // Tambahkan file gambar ke FormData
@@ -113,31 +149,61 @@ const AddDress = () => {
                 onChange={(e) => setKategori(e.target.value)}
                 required
               >
-                <option value="" disabled>Pilih Kategori</option>
+                <option value="" disabled>
+                  Pilih Kategori
+                </option>
                 <option value="Gaun Pengantin">Gaun Pengantin</option>
                 <option value="Kebaya">Kebaya</option>
                 <option value="Jas">Jas</option>
                 <option value="Batik">Batik</option>
                 <option value="Baju Adat">Baju Adat</option>
-                <option value="Aksesoris Pernikahan">Aksesoris Pernikahan</option>
+                <option value="Aksesoris Pernikahan">
+                  Aksesoris Pernikahan
+                </option>
               </Form.Select>
             </Form.Group>
 
             <Form.Group className="field">
               <Form.Label>Ukuran</Form.Label>
-              <Form.Select
-                value={ukuran}
-                onChange={(e) => setUkuran(e.target.value)}
-                required
-              >
-                <option value="" disabled>Pilih Ukuran</option>
-                <option value="s">S</option>
-                <option value="m">M</option>
-                <option value="l">L</option>
-                <option value="xl">XL</option>
-                <option value="xxl">XXL</option>
-                <option value="xxxl">XXXL</option>
-              </Form.Select>
+              {ukuran.map((item, index) => (
+                <div
+                  key={index}
+                  style={{ display: "flex", gap: "10px", marginBottom: "10px" }}
+                >
+                  <Form.Select
+                    value={item.ukuran}
+                    onChange={(e) => handleUkuranChange(e, index)}
+                    required
+                    style={{
+                      maxWidth: "100px",
+                    }}
+                  >
+                    <option value="" disabled>
+                      Size
+                    </option>
+                    <option value="s">S</option>
+                    <option value="m">M</option>
+                    <option value="l">L</option>
+                    <option value="xl">XL</option>
+                    <option value="xxl">XXL</option>
+                    <option value="xxxl">XXXL</option>
+                    <option value="-">-</option>
+                  </Form.Select>
+                  <Form.Control
+                    type="number"
+                    placeholder="Jumlah"
+                    value={item.jumlah}
+                    min={0}
+                    onChange={(e) => handleJumlahChange(e, index)}
+                    style={{
+                      maxWidth: "100px",
+                    }}
+                    required
+                  />
+                  {ukuran.length > 1 && <Button onClick={() => handelRemoveArrayUkuran(index)} >-</Button>}
+                </div>
+              ))}
+              <Button onClick={handelAddArrayUkuran}>+</Button>
             </Form.Group>
 
             <Form.Group className="field">
@@ -164,17 +230,6 @@ const AddDress = () => {
           </Col>
 
           <Col>
-            <Form.Group className="field">
-              <Form.Label>Jumlah</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Jumlah"
-                value={jumlah}
-                onChange={(e) => setJumlah(e.target.value)}
-                required
-              />
-            </Form.Group>
-
             <Form.Group>
               <Form.Label>Detail</Form.Label>
               <Form.Control
