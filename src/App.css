@@ -1,0 +1,112 @@
+.App {
+  text-align: center;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.full-height-sidebar {
+  height: 100hv;
+  color: #fff;
+  overflow-y: auto;
+  width: 0%; /* Lebar sidebar saat terbuka */
+  transition: transform 0.3s; /* Animasi saat tampil/sembunyi */
+
+  transform: translateX(-200px); /* Sembunyikan sidebar saat awalnya */
+
+  /* height: 100vh; */
+  /*background-color: #333; /* Ganti warna latar belakang sesuai kebutuhan Anda */
+  /* color: #fff;
+  overflow-y: auto; */
+
+  /* height: 100vh;
+  overflow-y: auto; /* Tambahkan overflow jika konten sidebar terlalu panjang */
+  /* background-color: #333; Ganti warna latar belakang sesuai kebutuhan Anda */
+  /* color: #fff;*/
+  width: 0;
+  /* height: 100%; */
+  /* position: fixed; */
+  /* top: 0; */
+  /* left: 0;*/
+  /* overflow-x: hidden; */
+  transition: 0.3s;
+  /*padding-top: 60px; */
+
+  transform: translateX(-250px); /*Sembunyikan sidebar saat awalnya */
+}
+  
+.full-height-sidebar.open {
+  width: 200px;
+  transform: translateX(0); /*Tampilkan sidebar saat dibuka*/
+}
+
+
+.content {
+  margin-left: 0;
+  transition: 0.3s;
+  /* flex-grow: 1; */
+}
+
+/* CSS untuk mengatur tampilan konten utama ketika sidebar dibuka */
+/* .content.open {
+  margin-left: 200px; /* Sesuaikan dengan lebar sidebar saat terbuka */
+/*} */
+
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.bg-body-tertiary {
+  background-color: #6777EF !important;
+}
+
+.preview-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.image-preview img {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 3px;
+}

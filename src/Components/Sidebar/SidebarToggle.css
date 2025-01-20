@@ -1,0 +1,44 @@
+
+.sidebar-toggle {
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    cursor: pointer;
+    font-size: 24px;
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+    color: #333; /* Warna default */
+  }
+  
+  .sidebar-toggle:hover {
+    transform: scale(1.2);
+  }
+
+  .sidebar-toggle.open:hover {
+    transform: scale(1.1);
+  }
+  
+  .sidebar-toggle .toggle-icon {
+    display: inline-block;
+    /* transition: color 0.3s ease-in-out; */
+  }
+  
+  .sidebar-toggle.open {
+    position:absolute;
+    /* transform: rotate(90deg); */
+    left: 30px;
+    top: 50px;
+    cursor: pointer;
+    font-size: 24px;
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+    color: #ffffff; /* Warna default */
+    /* transition: transform 0.3s ease-in-out; */
+  }
+  
+  .sidebar-toggle.open .toggle-icon {
+    color: #ffffff; /* Atur kembali warna ikon saat sidebar terbuka */
+    /* transition: color 0.3s ease-in-out; Tambahkan efek transisi warna */
+    z-index: 2000; /* Pastikan ikon muncul di atas sidebar yang terbuka */
+  }
+  
