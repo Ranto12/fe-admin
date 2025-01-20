@@ -2,10 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button, Pagination, Card, InputGroup, FormControl, Container, Row, Col, Modal } from "react-bootstrap";
 import Layout from "../Components/Layout";
-import { useNavigate } from "react-router-dom";
-import io from "socket.io-client";
-
-const socket = io('http://localhost:3001'); 
 
 const UserPage = () => {
   const [users, setUsers] = useState([]);
@@ -13,33 +9,11 @@ const UserPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showChatModal, setShowChatModal] = useState(false); // State untuk modal chat
-  const [selectedUser, setSelectedUser] = useState(null); // State untuk pengguna yang dipilih
-  const [message, setMessage] = useState('');
-  const [chat, setChat] = useState([]);
-
-  useEffect(() => {
-    getUsers();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, itemsPerPage, searchQuery]);
-
-  useEffect(() => {
-    if (!selectedUser) return;
-
-    const handleMessage = (data) => {
-      if (data.recipient_id === 1 && data.sender_id === selectedUser.id) {
-        setChat((prevChat) => [...prevChat, data]);
-      }
-    };
-
-    socket.on('message', handleMessage);
-    return () => socket.off('message', handleMessage);
-  }, [selectedUser]);
-
-  useEffect(() => {
-    const chatBox = document.querySelector('.chat-box');
-    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-  }, [chat]);
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [idUser, setIdUser] = useState(null);
 
   const getUsers = async () => {
     try {
@@ -49,7 +23,7 @@ const UserPage = () => {
         },
         params: {
           role: "user",
-        }
+        },
       });
       const filteredUsers = response.data;
       setUsers(filteredUsers);
@@ -59,42 +33,45 @@ const UserPage = () => {
     }
   };
 
+  const fetchMessagesId = async (id) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/messages/${id}`);
+      setMessages(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, itemsPerPage, searchQuery]);
+
   const handlePageChange = (page) => setCurrentPage(page);
 
   const handleSearchChange = (e) => setSearchQuery(e.target.value);
 
   const handleSendMessage = async () => {
-    if (!message.trim()) return;
     try {
-      const payload = {
-        sender_id: 1, // ID admin
-        recipient_id: selectedUser.id,
+      await axios.post(`http://localhost:5000/api/messages/create`, {
+        senderId: localStorage.getItem("userId"),
+        receiverId: idUser,
         message,
-      };
-
-      await axios.post('http://localhost:3000/api/messages/send', payload);
-      socket.emit('message', payload);
-      setChat((prevChat) => [...prevChat, { sender: 'Admin', message, createdAt: new Date().toISOString() }]);
-      setMessage('');
+      });
+      fetchMessagesId(idUser);
+      setMessage("");
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.log(error);
     }
   };
 
-  const openChatModal = async (user) => {
-    setSelectedUser(user);
-    setChat([]); 
+  const openChatModal = async (id) => {
+    setMessage("");
+    fetchMessagesId(id);
     setShowChatModal(true);
-
-    try {
-        const response = await axios.get(`http://localhost:3000/api/messages/conversation/1/${user.id}`);
-        setChat(response.data.data);
-    } catch (error) {
-        console.error("Error fetching messages:", error);
-        alert("Gagal mengambil pesan. Coba lagi nanti.");
-    }
-};
-
+    setIdUser(id);
+    setSelectedUser(users.find((user) => user.id === id)); // Find the user by id
+  };
 
   const closeChatModal = () => {
     setShowChatModal(false);
@@ -124,7 +101,9 @@ const UserPage = () => {
                 <Card.Body>
                   <Card.Title>{user.name}</Card.Title>
                   <Card.Text>Email: {user.email}</Card.Text>
-                  <Button variant="primary" onClick={() => openChatModal(user)}>Kirim Pesan</Button>
+                  <Button variant="primary" onClick={() => openChatModal(user.id)}>
+                    Kirim Pesan
+                  </Button>
                 </Card.Body>
               </Card>
             </Col>
@@ -148,15 +127,46 @@ const UserPage = () => {
             <Modal.Title>Chat dengan {selectedUser?.name}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <div className="chat-box" style={{ border: '1px solid black', height: '300px', overflowY: 'scroll' }}>
-              {chat.map((msg, index) => (
-                <div key={index}>
-                  <strong>{msg.sender}: </strong>{msg.message}
-                  <small className="text-muted" style={{ marginLeft: '10px' }}>
-                    {new Date(msg.createdAt).toLocaleString()}
-                  </small>
-                </div>
-              ))}
+            <div
+              className="chat-box"
+              style={{
+                border: "1px solid #D85C8C",
+                height: "300px",
+                overflowY: "scroll",
+                padding: "10px",
+                borderRadius: "5px",
+                backgroundColor: "#FCE4E4", // Background warna pink muda
+              }}
+            >
+              {messages.length > 0 ? (
+                messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      marginBottom: "10px",
+                      display: "flex",
+                      justifyContent:
+                        msg.sender.role === "user" ? "flex-start" : "flex-end",
+                    }}
+                  >
+                    <p
+                      style={{
+                        textAlign:
+                          msg.sender.role === "user" ? "start" : "end",
+                        backgroundColor:
+                          msg.sender.role === "user" ? "white" : "GrayText",
+                        borderRadius: "10px 0 10px 0",
+                        padding: "5px 10px",
+                        maxWidth: "70%",
+                      }}
+                    >
+                      {msg.message}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p>Belum ada pesan</p>
+              )}
             </div>
             <InputGroup className="mt-3">
               <FormControl

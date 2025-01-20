@@ -41,7 +41,7 @@ const ManageOrders = () => {
     if (!Array.isArray(payments) || payments.length === 0) {
       return "Tidak ada pembayaran.";
     }
-  
+
     if (payments.length === 1) {
       const payment = payments[0];
       if (payment.paymentStatus === "Pending") {
@@ -50,12 +50,12 @@ const ManageOrders = () => {
         return "Lunas";
       }
     }
-  
+
     if (payments.length === 2) {
       const completedPayments = payments.filter(
         (payment) => payment.paymentStatus === "Completed"
       ).length;
-  
+
       if (completedPayments === 2) {
         return "Lunas";
       } else if (completedPayments === 1) {
@@ -64,7 +64,7 @@ const ManageOrders = () => {
         return "Belum Bayar";
       }
     }
-  
+
     return "Data pembayaran tidak valid.";
   };
 
@@ -77,7 +77,7 @@ const ManageOrders = () => {
     "No Resi",
     "Status Pengiriman",
     "Status Pembayaran",
-    "Action"
+    "Action",
   ];
 
   const getOrderStatusTranslation = (status) => {
@@ -104,13 +104,14 @@ const ManageOrders = () => {
   const handleUpdateStatus = async (id) => {
     try {
       await axios.post("http://localhost:5000/api/orders/status", {
-        status: "Completed", orderId : id
-      })
+        status: "Completed",
+        orderId: id,
+      });
       getOrders();
     } catch (error) {
-      console.log("Success")
+      console.log("Success");
     }
-  }
+  };
 
   const data = orders.map((order, index) => ({
     No: index + 1 + (currentPage - 1) * itemsPerPage,
@@ -122,14 +123,18 @@ const ManageOrders = () => {
       <div>
         <p>{order?.Shipment?.trackingNumber}</p>
         <button
-        disabled={handleReturnPaymentStatus(order?.Payments) === "Tidak ada pembayaran."}
+          disabled={
+            !order?.Payments?.some(
+              (payment) => payment.paymentStatus === "Completed"
+            )
+          }
           style={{
             borderRadius: "8px",
             backgroundColor: "ButtonShadow",
           }}
           onClick={() => navigate(`/shipment/${order.id}`)}
         >
-         {order?.Shipment ? "Edit" : "Add"}
+          {order?.Shipment ? "Edit" : "Add"}
         </button>
       </div>
     ),
@@ -137,7 +142,17 @@ const ManageOrders = () => {
       <p>{getOrderStatusTranslation(order?.Shipment?.shippingStatus)}</p>
     ),
     "Status Pembayaran": <p>{handleReturnPaymentStatus(order?.Payments)}</p>,
-    Action: <Button onClick={() => handleUpdateStatus(order.id)} disabled={order?.status !== "Accepted" || handleReturnPaymentStatus(order?.Payments) !== "Lunas" }>{(order.status === "Completed" ? "Selesai" : "Selesaikan Order")}</Button>
+    Action: (
+      <Button
+        onClick={() => handleUpdateStatus(order.id)}
+        disabled={
+          order?.status !== "Accepted" ||
+          handleReturnPaymentStatus(order?.Payments) !== "Lunas"
+        }
+      >
+        {order.status === "Completed" ? "Selesai" : "Selesaikan Order"}
+      </Button>
+    ),
   }));
 
   const handlePageChange = (page) => {
