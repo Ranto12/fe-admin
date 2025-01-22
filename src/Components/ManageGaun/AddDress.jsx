@@ -62,7 +62,7 @@ const AddDress = () => {
 
   const saveGaun = async (e) => {
     e.preventDefault();
-
+    
     // Pastikan semua data diisi dengan benar
     if (
       !nama_produk ||
@@ -77,6 +77,8 @@ const AddDress = () => {
       console.error("All fields are required");
       return;
     }
+
+    
 
     // JSON.stringify([
     //   {
@@ -248,7 +250,7 @@ const AddDress = () => {
                 onChange={(e) => setStatus(e.target.value)}
                 required
               >
-                <option disabled>Status</option>
+                <option value="" disabled>Status</option>
                 <option value="Tersedia">Tersedia</option>
                 <option value="Tidak Tersedia">Tidak tersedia</option>
               </Form.Select>
