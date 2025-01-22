@@ -8,75 +8,20 @@ const ShipmentPage = () => {
   const navigate = useNavigate();
   const [order, setOrder] = useState();
   const { id } = useParams();
-  const [datas, setDatas] = useState({
-    shippingMethod: "",
-    province: "",
-    ongkir: 0,
-  });
-
-  const shippingCosts = [
-    {
-      provinsi: "Nanggroe Aceh Darussalam (Ibu Kota Banda Aceh)",
-      ongkir: 60000,
-    },
-    { provinsi: "Sumatera Utara (Ibu Kota Medan)", ongkir: 28000 },
-    { provinsi: "Sumatera Selatan (Ibu Kota Palembang)", ongkir: 23000 },
-    { provinsi: "Sumatera Barat (Ibu Kota Padang)", ongkir: 26000 },
-    { provinsi: "Bengkulu (Ibu Kota Bengkulu)", ongkir: 23000 },
-    { provinsi: "Riau (Ibu Kota Pekanbaru)", ongkir: 27000 },
-    { provinsi: "Kepulauan Riau (Ibu Kota Tanjung Pinang)", ongkir: 38000 },
-    { provinsi: "Jambi (Ibu Kota Jambi)", ongkir: 24000 },
-    { provinsi: "Lampung (Ibu Kota Bandar Lampung)", ongkir: 21000 },
-    { provinsi: "Bangka Belitung (Ibu Kota Pangkal Pinang)", ongkir: 6000 },
-    { provinsi: "Kalimantan Barat (Ibu Kota Pontianak)", ongkir: 51000 },
-    { provinsi: "Kalimantan Timur (Ibu Kota Samarinda)", ongkir: 24000 },
-    { provinsi: "Kalimantan Selatan (Ibu Kota Banjarbaru)", ongkir: 29000 },
-    { provinsi: "Kalimantan Tengah (Ibu Kota Palangkaraya)", ongkir: 6000 },
-    { provinsi: "Kalimantan Utara (Ibu Kota Tanjung Selor)", ongkir: 31000 },
-    { provinsi: "Banten (Ibu Kota Serang)", ongkir: 33000 },
-    { provinsi: "DKI Jakarta (Ibu Kota Jakarta)", ongkir: 17000 },
-    { provinsi: "Jawa Barat (Ibu Kota Bandung)", ongkir: 19000 },
-    { provinsi: "Jawa Tengah (Ibu Kota Semarang)", ongkir: 19000 },
-    {
-      provinsi: "Daerah Istimewa Yogyakarta (Ibu Kota Yogyakarta)",
-      ongkir: 20000,
-    },
-    { provinsi: "Jawa Timur (Ibu Kota Surabaya)", ongkir: 22000 },
-    { provinsi: "Bali (Ibu Kota Denpasar)", ongkir: 22000 },
-    { provinsi: "Nusa Tenggara Timur (Ibu Kota Kupang)", ongkir: 30000 },
-    { provinsi: "Nusa Tenggara Barat (Ibu Kota Mataram)", ongkir: 40000 },
-    { provinsi: "Gorontalo (Ibu Kota Gorontalo)", ongkir: 29000 },
-    { provinsi: "Sulawesi Barat (Ibu Kota Mamuju)", ongkir: 55000 },
-    { provinsi: "Sulawesi Tengah (Ibu Kota Palu)", ongkir: 29000 },
-    { provinsi: "Sulawesi Utara (Ibu Kota Manado)", ongkir: 28000 },
-    { provinsi: "Sulawesi Tenggara (Ibu Kota Kendari)", ongkir: 27000 },
-    { provinsi: "Sulawesi Selatan (Ibu Kota Makassar)", ongkir: 40000 },
-    { provinsi: "Maluku Utara (Ibu Kota Sofifi)", ongkir: 97000 },
-    { provinsi: "Maluku (Ibu Kota Ambon)", ongkir: 44000 },
-    { provinsi: "Papua Barat (Ibu Kota Manokwari)", ongkir: 120000 },
-    { provinsi: "Papua (Ibu Kota Jayapura)", ongkir: 82000 },
-    { provinsi: "Papua Tengah (Ibu Kota Nabire)", ongkir: 108000 },
-    { provinsi: "Papua Pegunungan (Ibu Kota Jayawijaya)", ongkir: 108000 },
-    { provinsi: "Papua Selatan (Ibu Kota Merauke)", ongkir: 85000 },
-    { provinsi: "Papua Barat Daya (Ibu Kota Sorong)", ongkir: 130000 },
-  ];
 
   const [data, setData] = useState({
     orderId: id,
     trackingNumber: "",
     shippingMethod: "",
     address: "",
-    cost: "",
+    cost: "10000",
   });
 
   const handleCreateShipment = async (e) => {
-    const { address, cost, shippingMethod, trackingNumber } = data;
+    const { shippingMethod, trackingNumber } = data;
     if (
-      address === "" ||
       shippingMethod === "" ||
-      cost === "" ||
-      trackingNumber === "" ||
-      cost === ""
+      trackingNumber === "" 
     ) {
       alert("lengkapi data pengiriman");
     }
@@ -143,24 +88,6 @@ const ShipmentPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleProvinceChange = (e) => {
-    const selectedProvince = e.target.value;
-    const provinceData = shippingCosts.find(
-      (province) => province.provinsi === selectedProvince
-    );
-    setDatas({
-      ...datas,
-      province: selectedProvince,
-    });
-    setData({
-      ...data,
-      cost: provinceData ? provinceData.ongkir : 0,
-    });
-  };
-
-  function formatRupiah(amount) {
-    return `Rp ${amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
-  }
 
   return (
     <Layout>
@@ -207,7 +134,7 @@ const ShipmentPage = () => {
                 <option value="Overnight">Satu Hari</option> */}
               </Form.Select>
             </Form.Group>
-            <Form.Group className="field">
+            {/* <Form.Group className="field">
               <Form.Label>Alamat Lengkap</Form.Label>
               <FloatingLabel controlId="floatingTextarea2">
                 <Form.Control
@@ -223,11 +150,11 @@ const ShipmentPage = () => {
                   }
                 />
               </FloatingLabel>
-            </Form.Group>
+            </Form.Group> */}
           </Col>
 
           <Col>
-            <Form.Group className="field">
+            {/* <Form.Group className="field">
               <Form.Label>Provinsi</Form.Label>
               <Form.Select
                 value={data.province}
@@ -241,8 +168,8 @@ const ShipmentPage = () => {
                   </option>
                 ))}
               </Form.Select>
-            </Form.Group>
-            <Form.Group className="field">
+            </Form.Group> */}
+            {/* <Form.Group className="field">
               <Form.Label>Ekstimasi Pembayaran</Form.Label>
               <Form.Control
                 type="text"
@@ -251,7 +178,7 @@ const ShipmentPage = () => {
                 disabled
                 required
               />
-            </Form.Group>
+            </Form.Group> */}
             <Form.Group>
               <Button
                 style={{
