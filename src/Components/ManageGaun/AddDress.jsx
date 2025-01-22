@@ -248,7 +248,7 @@ const AddDress = () => {
                 onChange={(e) => setStatus(e.target.value)}
                 required
               >
-                <option value="">Status</option>
+                <option disabled>Status</option>
                 <option value="Tersedia">Tersedia</option>
                 <option value="Tidak Tersedia">Tidak tersedia</option>
               </Form.Select>

@@ -19,6 +19,7 @@ import {
 import NotFound from "./NotFound.js";
 import ShipmentPage from "./Pages/ShipmentPage.jsx";
 import Ulasan from "./Pages/Ulasan.jsx";
+import OrderDetail from "./Pages/OrderDetail.jsx";
 
 function App() {
   return (
@@ -77,6 +78,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ManageOrders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/order/:id"
+          element={
+            <ProtectedRoute>
+              <OrderDetail />
             </ProtectedRoute>
           }
         />

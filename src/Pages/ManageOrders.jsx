@@ -75,8 +75,10 @@ const ManageOrders = () => {
     "produk",
     "Total",
     "No Resi",
+    "No Resi Pengembalian",
     "Status Pengiriman",
     "Status Pembayaran",
+    "Pembayaran",
     "Action",
   ];
 
@@ -122,20 +124,22 @@ const ManageOrders = () => {
     "No Resi": (
       <div>
         <p>{order?.Shipment?.trackingNumber}</p>
-        <button
-          disabled={
-            !order?.Payments?.some(
-              (payment) => payment.paymentStatus === "Completed"
-            )
-          }
-          style={{
-            borderRadius: "8px",
-            backgroundColor: "ButtonShadow",
-          }}
-          onClick={() => navigate(`/shipment/${order.id}`)}
-        >
-          {order?.Shipment ? "Edit" : "Add"}
-        </button>
+        {!order?.Shipment?.trackingNumber && (
+          <button
+            disabled={
+              !order?.Payments?.some(
+                (payment) => payment.paymentStatus === "Completed"
+              )
+            }
+            style={{
+              borderRadius: "8px",
+              backgroundColor: "ButtonShadow",
+            }}
+            onClick={() => navigate(`/shipment/${order.id}`)}
+          >
+            {order?.Shipment ? "Edit" : "Add"}
+          </button>
+        )}
       </div>
     ),
     "Status Pengiriman": (
@@ -153,7 +157,12 @@ const ManageOrders = () => {
         {order.status === "Completed" ? "Selesai" : "Selesaikan Order"}
       </Button>
     ),
+    Pembayaran: (
+      <Button onClick={() => navigate(`/order/${order.id}`)}>view</Button>
+    ),
+    "No Resi Pengembalian": <p>{order?.ReturnShipment?.noResi}</p>
   }));
+
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
