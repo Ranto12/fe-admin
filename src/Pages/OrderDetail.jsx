@@ -66,6 +66,7 @@ const OrderDetail = () => {
         <div
           style={{
             marginTop: "30px",
+           
           }}
         >
           {img.length === 0 && "belum ada pembayaran"}
@@ -78,7 +79,8 @@ const OrderDetail = () => {
                   src={item?.images[0]?.url}
                   alt={item?.images[0]?.url}
                   style={{
-                    width: "1000px",
+                    width: "400px",
+                     borderRadius: "10px"
                   }}
                 />
                 <div>

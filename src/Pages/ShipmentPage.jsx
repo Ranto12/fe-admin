@@ -1,4 +1,4 @@
-import { Button, Col, FloatingLabel, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, Row } from "react-bootstrap";
 import Layout from "../Components/Layout";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router";
