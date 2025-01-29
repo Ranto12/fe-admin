@@ -71,8 +71,8 @@ const GaunPage = () => {
   const handleConfirmDelete = async () => {
     if (deleteId) {
       try {
-        await axios.delete(
-          `http://localhost:5000/api/product/delete/${deleteId}`,
+        const response = await axios.post(
+          `http://localhost:5000/api/products/delete/${deleteId}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -80,7 +80,7 @@ const GaunPage = () => {
             },
           }
         );
-        setGaun(gauns.filter((gaun) => gaun.id !== deleteId));
+        alert(response?.data?.message)
       } catch (error) {
         console.error("Error deleting gaun:", error);
       }
